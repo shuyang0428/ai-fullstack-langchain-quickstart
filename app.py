@@ -98,5 +98,26 @@ prompt_value = prompt.invoke({
     "question": "生成器为什么比一次性创建列表更省内存？",
 })
 
-for message in prompt_value.to_messages():
-    print(type(message).__name__, message.text)
+# for message in prompt_value.to_messages():
+#     print(type(message).__name__, message.text)
+
+
+# 把模版和模型连起来
+# prompt模版本身不调用模型，他只负责生成模型输入，可以先生成消息再调用模型：
+prompt_value = prompt.invoke({
+    "domain": "数据库",
+    "question": "索引为什么能提高查询速度？",
+})
+
+response = model.invoke(prompt_value)
+# print(response.content)
+
+# 或者使用管道操作符把两者组合起来
+chain = prompt | model
+
+response = chain.invoke({
+    "domain": "数据库",
+    "question": "索引为什么能提高查询速度？",
+})
+
+# print(response.content)
