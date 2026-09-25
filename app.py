@@ -69,5 +69,34 @@ result = prompt.invoke({
     "text": "欢迎使用我们的产品",
 })
 
-response = model.invoke(result)
-print(response.content)
+# response = model.invoke(result)
+# print(response.content)
+
+# 如果只想拿到普通字符串也可以用format
+text_prompt = prompt.format(
+    target_language = 'English',
+    text = '订单已被发出'
+)
+# print(text_prompt)
+
+# 使用ChatPromptTemplate生成消息
+from langchain_core.prompts import ChatPromptTemplate
+
+prompt = ChatPromptTemplate.from_messages([
+    (
+        "system",
+        "你是一名{domain}领域的顾问。回答要准确、简洁；不确定时明确说明。",
+    ),
+    (
+        "human",
+        "请回答下面的问题：\n\n{question}",
+    ),
+])
+
+prompt_value = prompt.invoke({
+    "domain": "Python",
+    "question": "生成器为什么比一次性创建列表更省内存？",
+})
+
+for message in prompt_value.to_messages():
+    print(type(message).__name__, message.text)
