@@ -42,10 +42,32 @@ messages = [
 
 # 保留完整的aimessage，保留assistant角色
 first_response = model.invoke(messages)
-messages.append(first_response)
+messages.append(first_response) # type: ignore
 
 messages.append(HumanMessage('what is my name'))
 
 # 再次发送包含历史的完整消息列表
 second_response = model.invoke(messages)
-print(second_response.text) 
+# print(second_response.text) 
+
+# 受用prompttemplate生成文本提示词，PromptTemplate接受一段带占位符的文本
+# 调用时传入变量，他会生成填充后的完整内容
+
+from langchain_core.prompts import PromptTemplate
+
+prompt = PromptTemplate.from_template(
+    """
+你是一名专业翻译。请把下面内容翻译成{target_language}，保持原本含义和语气，不要增加解释。
+
+待翻译内容：
+{text}
+""".strip()
+)
+
+result = prompt.invoke({
+    "target_language": "English",
+    "text": "欢迎使用我们的产品",
+})
+
+response = model.invoke(result)
+print(response.content)
