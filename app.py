@@ -121,3 +121,27 @@ response = chain.invoke({
 })
 
 # print(response.content)
+
+# 如果模板需要接收一组历史消息，不能简单地把 Python 列表塞进 {history}。
+# 这样会把列表转换成一段没有角色信息的文字，模型无法准确判断哪些是用户说的，哪些是助手回答的。
+from langchain.messages import AIMessage, HumanMessage
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "你是一名耐心的客服助手。"),
+    MessagesPlaceholder("history", optional=True), #调用 prompt.invoke的时候把history这个变量传入就会把掐红的消息逐条插入这里
+    ("human", "{question}"),
+])
+
+history = [
+    HumanMessage("我的订单还没到。"),
+    AIMessage("请提供订单号，我来帮你查询。"),
+]
+
+prompt_value = prompt.invoke({
+    "history": history,
+    "question": "订单号是 A1024。",
+})
+
+# for message in prompt_value.to_messages():
+#     print(type(message).__name__, message.text)
