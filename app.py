@@ -165,3 +165,24 @@ customer_service_prompt = base_prompt.partial(
 prompt_value = customer_service_prompt.invoke({
     "question": "如何导出本月账单？"
 })
+
+# 加入Few-Shot
+#当一条规则很难用语言解释清楚时，可以在 Prompt 中放少量输入输出示例，让模型直接观察期望模式。
+# 这种方法通常叫 Few-shot Prompting。
+prompt = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system", 
+            "把用户反馈分类为 bug、feature 或 question，只返回分类名称。"
+        ),
+        ("human", "登录后页面一直空白"),
+        ("ai", "bug"),
+        ("human", "希望增加深色模式"),
+        ("ai", "feature"),
+        ("human", "{feedback}"),
+    ]
+)
+# 先生成 fewshot消息再调用模型
+response = (prompt | model).invoke({ #把prompt的输出给model
+    "feedback": "导出的文件保存在哪里？"
+})
