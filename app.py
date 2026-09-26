@@ -145,3 +145,23 @@ prompt_value = prompt.invoke({
 
 # for message in prompt_value.to_messages():
 #     print(type(message).__name__, message.text)
+
+
+# 固定一部分变量
+# ​有些变量对整个应用都不变。例如产品名称、品牌语气和输出语言，没有必要每次调用都重新传入。
+# partial 可以先固定这些值，得到一个新的模板：
+# partial 不会修改原模板，而是返回一个已经填好部分变量的新模板。
+# 这样可以从一个基础模板派生出不同产品或不同语言的版本，又不用复制整段内容。
+base_prompt = ChatPromptTemplate.from_messages([
+    ("system", "你是{product_name}的客服，统一使用{language}回答。"),
+    ("human", "{question}"),
+])
+# 预先固定每次都相同的变量
+customer_service_prompt = base_prompt.partial(
+    product_name="云记账",
+    language="中文",
+)
+# 只需要传入尚未固定的变量
+prompt_value = customer_service_prompt.invoke({
+    "question": "如何导出本月账单？"
+})
